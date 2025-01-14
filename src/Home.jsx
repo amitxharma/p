@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 function Home() {
     const [content, setContent] = useState('');
     const [isMobile, setIsMobile] = useState(false);
+    const [isSaving, setIsSaving] = useState(false); // State for loader
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -32,6 +33,7 @@ function Home() {
     }, [content, isMobile]);
 
     const saveContent = async () => {
+        setIsSaving(true); // Start loader
         try {
             const response = await fetch('https://pastingbuddy.onrender.com/paste', {
                 method: 'POST',
@@ -52,6 +54,8 @@ function Home() {
             navigate(`/${shortUrl}`);
         } catch (error) {
             console.error('Error saving content:', error.message);
+        } finally {
+            setIsSaving(false); // Stop loader
         }
     };
 
@@ -75,7 +79,12 @@ function Home() {
                     onChange={(e) => setContent(e.target.value)}
                 ></textarea>
                 {!content && !isMobile && (
-                    <div className="absolute font-semibold">Ctrl + S to save</div>
+                    <div className="absolute font-extrabold text-6xl opacity-10">Ctrl + S to save</div>
+                )}
+                {isSaving && (
+                    <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50">
+                        <div className="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+                    </div>
                 )}
             </main>
         </div>
